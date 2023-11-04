@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Bookings</title>
+</head>
+
+<body>
+  <h1>Bookings Today</h1>
+  <ul>
+    {% for booking in bookings_today %}
+    <li>Booking ID: {{ booking.booking_id }}, Customer ID: {{ booking.customer_id }}, Vehicle ID: {{ booking.vehicle_id
+      }}, Price: {{ booking.price }}, Start Date: {{ booking.start_date }}, End Date: {{ booking.end_date }}</li>
+    {% endfor %}
+  </ul>
+
+  <h1>Add Booking</h1>
+  <form action="/bookings" method="post">
+    <label for="customer_id">Customer ID:</label>
+    <input type="number" id="customer_id" name="customer_id">
+    <label for="vehicle_id">Vehicle ID:</label>
+    <input type="number" id="vehicle_id" name="vehicle_id">
+    <label for="start_date">Hire Date:</label>
+    <input type="date" id="start_date" name="start_date">
+    <label for="end_date">Return Date:</label>
+    <input type="date" id="end_date" name="end_date">
+    <input type="submit" value="Add Booking">
+  </form>
+
+  <p>{{ message }}</p>
+
+
+</body>
+
+</html>
