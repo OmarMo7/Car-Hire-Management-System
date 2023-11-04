@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Add Vehicle</title>
+</head>
+
+<body>
+  <h1>Add Vehicle</h1>
+  <form action="/vehicles" method="post">
+    <label for="vehicle_model">Vehicle Model:</label>
+    <select id="vehicle_model" name="vehicle_model">
+      <option value="small car">Small Car</option>
+      <option value="family car">Family Car</option>
+      <option value="van">Van</option>
+    </select>
+    <label for="price">Price:</label>
+    <input type="text" id="price" name="price">
+    <input type="submit" value="Add Vehicle">
+  </form>
+</body>
+
+</html>
