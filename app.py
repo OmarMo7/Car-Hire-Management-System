@@ -3,11 +3,6 @@ from flask import render_template
 from flask_mysqldb import MySQL
 from datetime import datetime
 
-# from flask.cli import with_appcontext
-# import click
-# import os
-
-
 app = Flask(__name__, template_folder='template')
 app.config['EXPLAIN_TEMPLATE_LOADING'] = True
 
@@ -40,8 +35,6 @@ def load_sql_commands_from_file(filename):
 # Load and execute SQL commands from "table.sql" file
 load_sql_commands_from_file('./tables.sql')
 
-# print(result)
-
 
 @app.route('/', methods=['GET'])
 def home():
@@ -72,6 +65,7 @@ def customers():
         name = request.form['name']
         email = request.form['email']
         phone = request.form['phone']
+
         # Add the customer to the database
         cur = mysql.connection.cursor()
         cur.execute(
@@ -91,7 +85,7 @@ def customers():
     cur.close()
     return render_template('customers.html', customers=customers)
 
-
+# Perform booking operation - Get the information of some bookings
 @app.route('/bookings', methods=['GET', 'POST'])
 def booking():
     message = ''
@@ -150,8 +144,64 @@ def booking():
 
     return render_template('bookings.html', bookings_today=bookings_today, message=message)
 
+# Get some customer's data
+@app.route('/customers/<int:customer_id>', methods=['GET'])
+def get_customer(customer_id):
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM customers WHERE customer_id = %s",
+                (customer_id,))
+    customer = cur.fetchone()
+
+    cur.execute("SELECT * FROM bookings WHERE customer_id = %s",
+                (customer_id,))
+    bookings = cur.fetchall()
+
+    # Calculate the total price for all the bookings
+    cur.execute("SELECT SUM(price) FROM bookings WHERE customer_id = %s",
+                (customer_id,))
+    total_price = cur.fetchone()
+    total_price = total_price['SUM(price)']
+
+    cur.close()
+
+    if customer:
+        return render_template('customer.html', customer=customer, bookings=bookings, total_price=total_price)
+    else:
+        return 'Customer not found', 404
 
 
+# Update some customer's data 
+@app.route('/customers/<int:customer_id>', methods=['POST'])
+def update_customer(customer_id):
+    name = request.form['name']
+    email = request.form['email']
+    phone = request.form['phone']
+
+    cur = mysql.connection.cursor()
+    cur.execute(
+        "UPDATE customers SET name = %s, email = %s, phone = %s WHERE customer_id = %s",
+        (name, email, phone, customer_id)
+    )
+    mysql.connection.commit()
+    cur.close()
+
+    return redirect(url_for('get_customer', customer_id=customer_id))
+
+
+# Delete a customer
+@app.route('/delete_customer/<int:customer_id>', methods=['POST'])
+def delete_customer(customer_id):
+    cur = mysql.connection.cursor()
+
+    # Delete all bookings associated with the customer first before deleting them
+    cur.execute("DELETE FROM bookings WHERE customer_id = %s", (customer_id,))
+
+    cur.execute("DELETE FROM customers WHERE customer_id = %s", (customer_id,))
+
+    mysql.connection.commit()
+    cur.close()
+
+    return redirect(url_for('customers'))
 
 
 if __name__ == '__main__':
