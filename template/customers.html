@@ -16,6 +16,14 @@
     <input type="tel" id="phone" name="phone">
     <input type="submit" value="Add Customer">
   </form>
+
+  <h2>Existing Customers</h2>
+  <ul>
+    {% for customer in customers %}
+    <li><a href="/customers/{{ customer.customer_id }}">{{ customer.name }} - {{customer.customer_id}}</a></li>
+    {% endfor %}
+  </ul>
+
 </body>
 
 </html>
